@@ -11,10 +11,10 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
+  - Ground
+  - Ladders
+  - Player
+  - Backgroud
   - 
   - 
   - 
@@ -40,4 +40,19 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 3874028111
+    locked: 0
+  - name: Environment Layer
+    uniqueID: 3161551029
+    locked: 0
+  - name: Plaforms
+    uniqueID: 3068180497
+    locked: 0
+  - name: Ladders
+    uniqueID: 966077691
+    locked: 0
+  - name: Player
+    uniqueID: 1557859973
     locked: 0
