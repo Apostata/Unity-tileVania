@@ -1,9 +1,8 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using UnityEngine;
 using UnityEngine.InputSystem;
+
 
 public class Player : MonoBehaviour
 {
@@ -11,9 +10,12 @@ public class Player : MonoBehaviour
     Vector2 moveInput;
     Rigidbody2D playerRigidbody;
     Animator playerAnimator;
-    Collider2D playerCollider;
+    Collider2D playerBodyCollider;
+    Collider2D playerFeetCollider;
     float gravityScale = 0f;
     float initialJumpForce = 5f;
+
+    bool wasHitted = false;
 
     [SerializeField] float playerSpeed = 10f;
     [SerializeField] float jumpForce = 5f;
@@ -24,7 +26,8 @@ public class Player : MonoBehaviour
     {
         playerRigidbody = GetComponent<Rigidbody2D>();
         playerAnimator = GetComponent<Animator>();
-        playerCollider = GetComponent<CapsuleCollider2D>();
+        playerBodyCollider = GetComponent<CapsuleCollider2D>();
+        playerFeetCollider = GetComponent<BoxCollider2D>();
         gravityScale = playerRigidbody.gravityScale;
         initialJumpForce = jumpForce;
     }
@@ -33,11 +36,12 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(wasHitted){ return;}
+
         Run(); 
-        RunAnimation();
-        Climb();
-        // ClimbAnimation();
-       
+        Climb();       
+        Hitted();
+        
     }
 
     void RunAnimation()
@@ -50,78 +54,28 @@ public class Player : MonoBehaviour
         
         playerAnimator.SetBool("isRunning", playerHasHorizontalSpeed);
     }
-bool IsCollidingAtXPosition(float xPosition, LayerMask layerMask)
-{
-    bool isTouchingGroundBySide = playerCollider.IsTouchingLayers(layerMask);
 
-    if (isTouchingGroundBySide)
-    {
-        RaycastHit2D hit = Physics2D.Raycast(new Vector2(xPosition, transform.position.y), Vector2.up, 0.1f, layerMask);
-        return hit.collider != null;
-    }
-
-    return false;
-}
-
-    bool isCollidingAt2DPosition(Vector2 direction, float positionX, float positionY, LayerMask layerMask){
-        bool isTouchingLayer = playerCollider.IsTouchingLayers(layerMask);
-
-        if(isTouchingLayer){
-            RaycastHit2D hit = Physics2D.Raycast(new Vector2(positionX, positionY), direction, 0.1f, layerMask);
-            return hit.collider != null;
-        }
-        return false;
-    }
-
-    Dictionary<string, bool> getCollisionsPositions(LayerMask layerMask){
-        Dictionary<string, bool> collisions = new Dictionary<string, bool>
-        {
-            { "top", isCollidingAt2DPosition(Vector2.up, transform.position.x, transform.position.y + 0.5f, layerMask) },
-            { "bottom", isCollidingAt2DPosition(Vector2.down, transform.position.x, transform.position.y - 0.5f, layerMask) },
-            { "left", isCollidingAt2DPosition(Vector2.left, transform.position.x - 0.5f, transform.position.y, layerMask) },
-            { "right", isCollidingAt2DPosition(Vector2.right, transform.position.x + 0.5f, transform.position.y, layerMask) },
-        };
-        return collisions;
-    }
-
-   
-    // void ClimbAnimation()
-    // {
-    //     bool playerHasVerticalSpeed = Mathf.Abs(playerRigidbody.velocity.y) > Mathf.Epsilon;
-    //     bool playerHasHorizontalSpeed = Mathf.Abs(playerRigidbody.velocity.x) > Mathf.Epsilon;
-
-    //     LayerMask ladderLayer = LayerMask.GetMask("Ladders");
-    //     LayerMask groundLayer = LayerMask.GetMask("Ground");
-
-    //     bool isTouchingLadder = playerCollider.IsTouchingLayers(ladderLayer);
-    //     Dictionary<string, bool> groundCollisions = getCollisionsPositions(groundLayer);
-       
-    //     if(!isTouchingLadder){ // when the player is not touching the ladder
-    //         playerRigidbody.gravityScale = gravityScale;
-    //         playerAnimator.SetBool("isClimbing", false);
-    //         return;
-    //     }
-        
-    //     playerAnimator.SetBool("isClimbing", true);
-    // }
-
+    
     void Run()
     {
         float playerMoveSpeed = playerSpeed * moveInput.x;
-        Vector2 playerVelocity = new Vector2(playerMoveSpeed, playerRigidbody.velocity.y);
+        Vector2 playerVelocity = new(playerMoveSpeed, playerRigidbody.velocity.y);
         playerRigidbody.velocity = playerVelocity;
+        RunAnimation();
     }
 
     void OnMove(InputValue value) // occurs when the player moves the joystick or keyboard keys are pressed, this method is comming from the inoput
     {
+        if(wasHitted){ return;}
         moveInput = value.Get<Vector2>();
     }
 
     void OnJump(InputValue value) // occurs when the player presses the jump button, this method is comming from the inoput
     {
+        if(wasHitted){ return;}
         bool jumped = value.isPressed;
         LayerMask groundLayer = LayerMask.GetMask("Ground");
-        bool isTouchingGround = playerCollider.IsTouchingLayers(groundLayer);
+        bool isTouchingGround = playerFeetCollider.IsTouchingLayers(groundLayer);
         float playerYVelocity = playerRigidbody.velocity.y;
         
         if (jumped && isTouchingGround && playerYVelocity == 0)
@@ -134,16 +88,12 @@ bool IsCollidingAtXPosition(float xPosition, LayerMask layerMask)
     {
         float playerClimbSpeed = climbSpeed * moveInput.y;
         LayerMask ladderLayer = LayerMask.GetMask("Ladders");
-        LayerMask groundLayer = LayerMask.GetMask("Ground");
 
-        bool isTouchingLadder = playerCollider.IsTouchingLayers(ladderLayer);
+        bool isTouchingLadder = playerFeetCollider.IsTouchingLayers(ladderLayer);
         bool playerHasVerticalSpeed = Mathf.Abs(playerRigidbody.velocity.y) > Mathf.Epsilon;
-        bool playerHasHorizontalSpeed = Mathf.Abs(playerRigidbody.velocity.x) > Mathf.Epsilon;
 
         Vector2 playerClimbVelocity = new Vector2(playerRigidbody.velocity.x, playerClimbSpeed);
 
-        Dictionary<string, bool> groundCollisions = getCollisionsPositions(groundLayer);
-        Dictionary<string, bool> ladderCollisions = getCollisionsPositions(ladderLayer);
 
         if(!isTouchingLadder){
             playerRigidbody.gravityScale = gravityScale;
@@ -157,5 +107,20 @@ bool IsCollidingAtXPosition(float xPosition, LayerMask layerMask)
         playerRigidbody.velocity = playerClimbVelocity;
         playerAnimator.SetBool("isClimbing", playerHasVerticalSpeed);
        
+    }
+
+    void Hitted(){
+        
+        LayerMask injuryLayer = LayerMask.GetMask("Enemy", "Hazards");
+
+        bool isTouchingEmeny = playerBodyCollider.IsTouchingLayers(injuryLayer);
+
+        if(isTouchingEmeny){
+            playerRigidbody.gravityScale = gravityScale;
+            playerRigidbody.sharedMaterial = null;
+            wasHitted = true;
+            playerAnimator.SetTrigger("Dying");
+        }
+        
     }
 }
