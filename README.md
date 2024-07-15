@@ -14,3 +14,10 @@ This is a 2D platformer game where the player must navigate through a series of 
 * A away to start and finish a level
 * A Timer to create urgency
 
+## Credits and copyrigth
+
+**This is only a sumary of the course from [GameDev.tv](https://www.gamedev.tv/) at udemy plataform [UnityComplete C# Unity Game Developer 2D](https://www.udemy.com/course/unitycourse)
+all rights reserved to them.**
+
+- [GameDev.tv](https://www.gamedev.tv/)
+- [UnityComplete C# Unity Game Developer 2D](https://www.udemy.com/course/unitycourse)
