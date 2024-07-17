@@ -20,7 +20,7 @@ TagManager:
   - Enemy
   - Hazards
   - Arrows
-  - 
+  - Environment
   - 
   - 
   - 
@@ -45,9 +45,6 @@ TagManager:
   - name: Background
     uniqueID: 3874028111
     locked: 0
-  - name: Environment Layer
-    uniqueID: 3161551029
-    locked: 0
   - name: Plaforms
     uniqueID: 3068180497
     locked: 0
@@ -56,6 +53,9 @@ TagManager:
     locked: 0
   - name: Hazards
     uniqueID: 3945070087
+    locked: 0
+  - name: Environment Layer
+    uniqueID: 3161551029
     locked: 0
   - name: Enemy
     uniqueID: 492074297
