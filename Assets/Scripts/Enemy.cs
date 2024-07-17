@@ -29,34 +29,22 @@ public class Enemy : MonoBehaviour
         transform.localScale = new Vector2(-enemyDirection, 1f);
     }
 
-
-    void OnTriggerEnter2D(Collider2D other)
+     void OnTriggerExit2D(Collider2D other) 
     {
-        
-        if (other.gameObject.layer == LayerMask.NameToLayer("Hazards"))
-        {
+        if(other.gameObject.layer == LayerMask.NameToLayer("Ground")){
+            moveSpeed = -moveSpeed;
+            FlipEnemy();
+        }
+       
+    }
+
+     void OnTriggerEnter2D(Collider2D other) {
+         if(other.gameObject.layer == LayerMask.NameToLayer("Hazards")){
             moveSpeed = -moveSpeed;
             FlipEnemy();
         }
         
     }
+    
 
-    void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
-        {
-            moveSpeed = -moveSpeed;
-            FlipEnemy();
-        }
-    }
-
-    void OnCollisionStay2D(Collision2D other)
-    {
-       Dictionary<string, bool> collisions = TwoDCollisionHelper.GetCollisionsPositions(transform, enemySideCollider, LayerMask.GetMask("Ground"));
-       if(collisions["left"] || collisions["right"] ){
-            moveSpeed = -moveSpeed;
-            FlipEnemy();
-        }
-        
-    }
 }

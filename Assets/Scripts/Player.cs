@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,14 +14,17 @@ public class Player : MonoBehaviour
     Collider2D playerBodyCollider;
     Collider2D playerFeetCollider;
     float gravityScale = 0f;
-    float initialJumpForce = 5f;
 
     bool wasHitted = false;
+
+    bool isFiring = false;
 
     [SerializeField] float playerSpeed = 10f;
     [SerializeField] float jumpForce = 5f;
     [SerializeField] float climbSpeed = 2.5f;
 
+    [SerializeField] GameObject arrow;
+    [SerializeField] Transform bow;
 
     void Start()
     {
@@ -29,7 +33,6 @@ public class Player : MonoBehaviour
         playerBodyCollider = GetComponent<CapsuleCollider2D>();
         playerFeetCollider = GetComponent<BoxCollider2D>();
         gravityScale = playerRigidbody.gravityScale;
-        initialJumpForce = jumpForce;
     }
     
 
@@ -76,11 +79,24 @@ public class Player : MonoBehaviour
         bool jumped = value.isPressed;
         LayerMask groundLayer = LayerMask.GetMask("Ground");
         bool isTouchingGround = playerFeetCollider.IsTouchingLayers(groundLayer);
-        float playerYVelocity = playerRigidbody.velocity.y;
         
-        if (jumped && isTouchingGround && playerYVelocity == 0)
+        if (jumped && isTouchingGround)
         {
             playerRigidbody.velocity += new Vector2(0, jumpForce);
+        }
+    }
+
+    async void OnFire (InputValue value) // occurs when the player presses the fire button, this method is comming from the inoput
+    {
+        if(wasHitted){ return;}
+        bool fired = value.isPressed;
+        if(fired && !isFiring){
+            playerAnimator.SetTrigger("Shoting");
+            isFiring = true;
+            await Task.Delay(400);
+            Instantiate(arrow, bow.position, transform.rotation);
+            await Task.Delay(200);
+            isFiring = false;
         }
     }
 
@@ -123,4 +139,5 @@ public class Player : MonoBehaviour
         }
         
     }
+
 }
