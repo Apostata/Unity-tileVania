@@ -21,7 +21,7 @@ TagManager:
   - Hazards
   - Arrows
   - Environment
-  - 
+  - Interactables
   - 
   - 
   - 
@@ -62,4 +62,10 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 1557859973
+    locked: 0
+  - name: UI
+    uniqueID: 1521140815
+    locked: 0
+  - name: Interactables
+    uniqueID: 766631319
     locked: 0

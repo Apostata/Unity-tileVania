@@ -1,18 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LevelExit : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] float levelLoadDelay = 1f;
+    void OnTriggerEnter2D(Collider2D other)
     {
-        
+        if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
+        {
+            StartCoroutine(LoadNextLevel());
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    IEnumerator LoadNextLevel()
     {
-        
+        yield return new WaitForSecondsRealtime(levelLoadDelay);
+
+        int nextLevel = SceneManager.GetActiveScene().buildIndex + 1;
+        if (nextLevel == SceneManager.sceneCountInBuildSettings)
+        {
+            nextLevel = 0;
+        }
+        SceneManager.LoadScene(nextLevel);
     }
 }

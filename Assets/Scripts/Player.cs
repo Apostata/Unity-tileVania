@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 
 public class Player : MonoBehaviour
@@ -136,8 +137,16 @@ public class Player : MonoBehaviour
             playerRigidbody.sharedMaterial = null;
             wasHitted = true;
             playerAnimator.SetTrigger("Dying");
+            StartCoroutine(Die());
         }
         
+    }
+
+    IEnumerator Die()
+    {
+       
+        yield return new WaitForSeconds(1f);
+        FindObjectOfType<GameSession>().ManagePlayerLives();
     }
 
 }
