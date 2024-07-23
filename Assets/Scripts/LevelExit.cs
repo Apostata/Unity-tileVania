@@ -16,13 +16,16 @@ public class LevelExit : MonoBehaviour
 
     IEnumerator LoadNextLevel()
     {
+        
         yield return new WaitForSecondsRealtime(levelLoadDelay);
 
         int nextLevel = SceneManager.GetActiveScene().buildIndex + 1;
         if (nextLevel == SceneManager.sceneCountInBuildSettings)
         {
-            nextLevel = 0;
+            FindObjectOfType<GameSession>().ResetGameSession();
+        } else{
+            FindObjectOfType<ScenePersist>().ResetScenePersist();
+            SceneManager.LoadScene(nextLevel);
         }
-        SceneManager.LoadScene(nextLevel);
     }
 }

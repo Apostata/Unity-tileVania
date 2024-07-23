@@ -11,6 +11,9 @@ public class GameSession : MonoBehaviour
 
     [SerializeField] int playerLives = 3;
     [SerializeField] int playerScore = 0;
+
+    [SerializeField] TextMeshProUGUI playerLivesText;
+    [SerializeField] TextMeshProUGUI playerScoreText;
     
    void Awake()
    {
@@ -28,7 +31,7 @@ public class GameSession : MonoBehaviour
         }
    }
 
-   void Update()
+   void Start()
    {
        DisplayPlayerLives();
        DisplayPlayerScore();
@@ -36,12 +39,12 @@ public class GameSession : MonoBehaviour
 
     private void DisplayPlayerScore()
     {
-        GameObject.Find("ScoreValue").GetComponent<TextMeshProUGUI>().text = playerScore.ToString();
+        playerScoreText.text = playerScore.ToString();
     }
 
     void DisplayPlayerLives()
     {
-         GameObject.Find("Lifes").GetComponent<TextMeshProUGUI>().text = playerLives.ToString();
+         playerLivesText.text = playerLives.ToString();
     }
 
     public void ManagePlayerLives()
@@ -60,6 +63,7 @@ public class GameSession : MonoBehaviour
     public void AddPlayerScore(int score)
     {
         playerScore += score;
+        DisplayPlayerScore();
     }
 
     void TakeLife()
@@ -67,10 +71,13 @@ public class GameSession : MonoBehaviour
         playerLives--;
         playerScore = 0;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        DisplayPlayerLives();
+        DisplayPlayerScore();
     }
 
-    void ResetGameSession()
+    public void ResetGameSession()
     {
+        FindObjectOfType<ScenePersist>().ResetScenePersist();
         SceneManager.LoadScene(0);
         Destroy(gameObject);
     }
